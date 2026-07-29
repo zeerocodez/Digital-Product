@@ -17,10 +17,16 @@ import {
   Sparkles,
   Lock,
   Eye,
-  Settings
+  Settings,
+  MessageSquare,
+  Download,
+  Copy,
+  FileSpreadsheet,
+  Send
 } from 'lucide-react';
 import { TESTIMONIALS } from '../data/courseData';
 import { Testimonial } from '../types';
+import { CapturedLead } from './LeadCapturePage';
 
 interface AdminDashboardModalProps {
   isOpen: boolean;
@@ -69,9 +75,106 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
   onClose,
   onPhotoUpdated
 }) => {
-  const [activeTab, setActiveTab] = useState<'author' | 'testimonials' | 'pricing' | 'analytics'>('author');
+  const [activeTab, setActiveTab] = useState<'author' | 'testimonials' | 'pricing' | 'leads' | 'analytics'>('author');
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(true); // default open for author ease
   const [pinInput, setPinInput] = useState<string>('');
+
+  // WhatsApp Group Link State
+  const [whatsappGroupUrl, setWhatsappGroupUrl] = useState<string>(() => {
+    return localStorage.getItem('admin_whatsapp_group_url') || 'https://chat.whatsapp.com/G9x8K19m7LVL2038';
+  });
+
+  // Captured Leads State
+  const [capturedLeads, setCapturedLeads] = useState<CapturedLead[]>(() => {
+    try {
+      const saved = localStorage.getItem('fb_ads_leads');
+      if (saved) return JSON.parse(saved);
+    } catch (e) {
+      console.error(e);
+    }
+    // Default initial mock seed leads if none exist
+    return [
+      {
+        id: 'lead_1',
+        name: 'Olawale Adeniyi',
+        email: 'olawale.dev@gmail.com',
+        phone: '+2348149201948',
+        goal: 'Freelancer / Content Creator',
+        timestamp: 'Today @ 08:24 AM',
+        source: 'Facebook Ads (Campaign #1)'
+      },
+      {
+        id: 'lead_2',
+        name: 'Blessing Kalu',
+        email: 'blessing.k@yahoo.com',
+        phone: '+2347039281044',
+        goal: 'Beginner looking for extra income',
+        timestamp: 'Today @ 07:45 AM',
+        source: 'Instagram Ads (Campaign #2)'
+      },
+      {
+        id: 'lead_3',
+        name: 'Ibrahim Danjuma',
+        email: 'ibrahim.d@outlook.com',
+        phone: '+2349028172910',
+        goal: 'Student / NYSC Corper',
+        timestamp: 'Yesterday @ 11:15 PM',
+        source: 'Facebook Ads (Campaign #1)'
+      }
+    ];
+  });
+
+  useEffect(() => {
+    const handleNewLead = () => {
+      try {
+        const saved = localStorage.getItem('fb_ads_leads');
+        if (saved) setCapturedLeads(JSON.parse(saved));
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    window.addEventListener('new_lead_captured', handleNewLead);
+    return () => window.removeEventListener('new_lead_captured', handleNewLead);
+  }, []);
+
+  const handleSaveWhatsappUrl = (e: React.FormEvent) => {
+    e.preventDefault();
+    localStorage.setItem('admin_whatsapp_group_url', whatsappGroupUrl);
+    window.dispatchEvent(new Event('whatsapp_link_updated'));
+    setStatusMessage({ type: 'success', text: 'WhatsApp Group Invite Link updated successfully!' });
+  };
+
+  const handleExportCSV = () => {
+    if (capturedLeads.length === 0) {
+      setStatusMessage({ type: 'error', text: 'No leads available to export.' });
+      return;
+    }
+    const headers = ['Name', 'Email', 'WhatsApp Phone', 'Goal', 'Timestamp', 'Source'];
+    const rows = capturedLeads.map(l => [
+      `"${l.name}"`,
+      `"${l.email}"`,
+      `"${l.phone}"`,
+      `"${l.goal}"`,
+      `"${l.timestamp}"`,
+      `"${l.source}"`
+    ]);
+    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `FB_Ad_Leads_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setStatusMessage({ type: 'success', text: 'Leads exported as CSV file!' });
+  };
+
+  const handleCopyPhones = () => {
+    if (capturedLeads.length === 0) return;
+    const phoneList = capturedLeads.map(l => l.phone).join(', ');
+    navigator.clipboard.writeText(phoneList);
+    setStatusMessage({ type: 'success', text: `Copied ${capturedLeads.length} WhatsApp phone numbers to clipboard!` });
+  };
 
   // Author Photo State
   const PRESET_IMAGES = [
@@ -293,6 +396,23 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
           >
             <DollarSign className="w-4 h-4" />
             <span>Pricing & Offers</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('leads')}
+            className={`px-5 py-3 font-bold uppercase border-r border-white/10 flex items-center gap-2 transition-all ${
+              activeTab === 'leads' 
+                ? 'bg-emerald-500 text-black' 
+                : 'text-emerald-400 hover:text-white hover:bg-emerald-500/10'
+            }`}
+          >
+            <MessageSquare className="w-4 h-4" />
+            <span>FB Leads & WhatsApp</span>
+            <span className={`px-1.5 py-0.5 text-[9px] rounded font-bold ${
+              activeTab === 'leads' ? 'bg-black text-emerald-400' : 'bg-emerald-500/20 text-emerald-400'
+            }`}>
+              {capturedLeads.length}
+            </span>
           </button>
 
           <button
@@ -584,6 +704,123 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
                 </div>
               </div>
             </form>
+          )}
+
+          {/* TAB: FB ADS LEADS & WHATSAPP GROUP CONFIG */}
+          {activeTab === 'leads' && (
+            <div className="space-y-6 font-mono">
+              
+              {/* 1. WhatsApp Group Invite Link Config */}
+              <div className="bg-[#050505] border border-emerald-500/30 p-6 space-y-4">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-sm font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-2">
+                    <MessageSquare className="w-4 h-4 text-emerald-400" />
+                    <span>WhatsApp Class Group Invite Link</span>
+                  </h4>
+                  <span className="text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 uppercase">
+                    ACTIVE CLASSROOM LINK
+                  </span>
+                </div>
+
+                <form onSubmit={handleSaveWhatsappUrl} className="space-y-3">
+                  <label className="text-[10px] text-white/60 block">
+                    Paste your WhatsApp Group Invite URL below. Leads captured from Facebook Ads will be directed to this link upon form submission:
+                  </label>
+
+                  <div className="flex gap-2">
+                    <input
+                      type="url"
+                      required
+                      value={whatsappGroupUrl}
+                      onChange={(e) => setWhatsappGroupUrl(e.target.value)}
+                      placeholder="https://chat.whatsapp.com/G9x8K19m7LVL2038"
+                      className="flex-1 bg-black border border-white/20 text-white text-xs p-3 focus:border-emerald-500 focus:outline-none"
+                    />
+                    <button
+                      type="submit"
+                      className="bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-xs px-5 py-3 uppercase tracking-wider flex items-center gap-1.5 shrink-0"
+                    >
+                      <Save className="w-4 h-4" />
+                      <span>Update Link</span>
+                    </button>
+                  </div>
+                </form>
+              </div>
+
+              {/* 2. Leads Overview Header & Action Bar */}
+              <div className="bg-[#050505] border border-white/10 p-5 space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div>
+                    <h4 className="text-sm font-bold text-white uppercase flex items-center gap-2">
+                      <FileSpreadsheet className="w-4 h-4 text-emerald-400" />
+                      <span>Captured Facebook Ads Leads ({capturedLeads.length})</span>
+                    </h4>
+                    <p className="text-xs text-white/50 font-sans mt-0.5">
+                      Contact records collected from your Facebook & Instagram Ads opt-in page.
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-2 shrink-0">
+                    <button
+                      onClick={handleCopyPhones}
+                      className="bg-white/10 hover:bg-white/20 border border-white/20 text-white text-xs px-3.5 py-2 uppercase tracking-wider flex items-center gap-1.5 transition-all"
+                      title="Copy all phone numbers for WhatsApp broadcast"
+                    >
+                      <Copy className="w-3.5 h-3.5 text-emerald-400" />
+                      <span>Copy All Phones</span>
+                    </button>
+
+                    <button
+                      onClick={handleExportCSV}
+                      className="bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-xs px-3.5 py-2 uppercase tracking-wider flex items-center gap-1.5 transition-all"
+                    >
+                      <Download className="w-3.5 h-3.5" />
+                      <span>Export CSV</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Table of Leads */}
+                <div className="overflow-x-auto border border-white/10 rounded mt-2">
+                  <table className="w-full text-left text-xs text-white/80">
+                    <thead className="bg-white/5 text-[10px] text-amber-500 uppercase border-b border-white/10 font-mono">
+                      <tr>
+                        <th className="p-3">#</th>
+                        <th className="p-3">Lead Name</th>
+                        <th className="p-3">WhatsApp Number</th>
+                        <th className="p-3">Email Address</th>
+                        <th className="p-3">Primary Goal</th>
+                        <th className="p-3">Timestamp</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-white/5">
+                      {capturedLeads.map((lead, idx) => (
+                        <tr key={lead.id} className="hover:bg-white/[0.02]">
+                          <td className="p-3 text-white/40 font-mono">{idx + 1}</td>
+                          <td className="p-3 font-bold text-white">{lead.name}</td>
+                          <td className="p-3 font-mono text-emerald-400 flex items-center gap-1">
+                            <MessageSquare className="w-3 h-3" />
+                            <a 
+                              href={`https://wa.me/${lead.phone.replace(/[^0-9]/g, '')}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="hover:underline"
+                            >
+                              {lead.phone}
+                            </a>
+                          </td>
+                          <td className="p-3 text-white/70">{lead.email}</td>
+                          <td className="p-3 text-white/60 text-[11px] font-sans">{lead.goal}</td>
+                          <td className="p-3 text-white/40 text-[10px]">{lead.timestamp}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+              </div>
+
+            </div>
           )}
 
           {/* TAB 4: ANALYTICS */}
