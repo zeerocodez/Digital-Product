@@ -81,7 +81,12 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
 
   // WhatsApp Group Link State
   const [whatsappGroupUrl, setWhatsappGroupUrl] = useState<string>(() => {
-    return localStorage.getItem('admin_whatsapp_group_url') || 'https://chat.whatsapp.com/G9x8K19m7LVL2038';
+    const saved = localStorage.getItem('admin_whatsapp_group_url');
+    if (!saved || saved.includes('G9x8K19m7LVL2038')) {
+      localStorage.setItem('admin_whatsapp_group_url', 'https://chat.whatsapp.com/IZ2z0e9BwFqBMCAG6IBMCs');
+      return 'https://chat.whatsapp.com/IZ2z0e9BwFqBMCAG6IBMCs';
+    }
+    return saved;
   });
 
   // Captured Leads State

@@ -6,7 +6,7 @@ interface InstructorSectionProps {
   onBuyClick: () => void;
 }
 
-const DEFAULT_PORTRAIT = 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=800&q=80';
+const DEFAULT_PORTRAIT = 'https://images.unsplash.com/photo-1522529599102-193c0d76b5b6?auto=format&fit=crop&w=800&q=80';
 
 export const InstructorSection: React.FC<InstructorSectionProps> = ({ onBuyClick }) => {
   const [imageSrc, setImageSrc] = useState<string>(() => {

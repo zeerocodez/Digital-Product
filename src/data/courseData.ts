@@ -36,7 +36,7 @@ export const TESTIMONIALS: Testimonial[] = [
     id: 't0_multicurrency',
     name: 'Pan-African Digital Publisher',
     role: 'Multi-Currency Creator (6 Countries)',
-    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
+    avatar: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?auto=format&fit=crop&w=400&q=80',
     verified: true,
     rating: 5,
     result: '2,217 Sales Across 6 Currencies',
