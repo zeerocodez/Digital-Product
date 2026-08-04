@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { BannerNotice } from './components/BannerNotice';
 import { Header } from './components/Header';
 import { Hero } from './components/Hero';
+import { OffersComparisonSection } from './components/OffersComparisonSection';
 import { ProfitCalculator } from './components/ProfitCalculator';
 import { InstructorSection } from './components/InstructorSection';
 import { CourseCurriculum } from './components/CourseCurriculum';
@@ -14,26 +15,35 @@ import { CheckoutModal } from './components/CheckoutModal';
 import { SamplePreviewModal } from './components/SamplePreviewModal';
 import { AdminDashboardModal } from './components/AdminDashboardModal';
 import { LeadCapturePage } from './components/LeadCapturePage';
+import { ThankYouPage } from './components/ThankYouPage';
 import { Footer } from './components/Footer';
+import { OfferId } from './types';
 
 export default function App() {
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
+  const [selectedOfferId, setSelectedOfferId] = useState<OfferId>('pdf_mentorship');
 
-  // Default to standalone Lead Capture Landing Page unless ?page=sales or #sales is specified
-  const [viewMode, setViewMode] = useState<'sales' | 'lead'>(() => {
+  // Default to standalone Lead Capture Landing Page unless ?page=sales or ?page=thankyou is specified
+  const [viewMode, setViewMode] = useState<'sales' | 'lead' | 'thankyou'>(() => {
     if (typeof window !== 'undefined') {
       const search = window.location.search;
       const hash = window.location.hash;
       if (search.includes('page=sales') || hash === '#sales') {
         return 'sales';
       }
+      if (search.includes('page=thankyou') || hash === '#thankyou') {
+        return 'thankyou';
+      }
     }
     return 'lead';
   });
 
-  const handleOpenCheckout = () => {
+  const handleOpenCheckout = (offerId?: OfferId) => {
+    if (offerId) {
+      setSelectedOfferId(offerId);
+    }
     setIsCheckoutOpen(true);
   };
 
@@ -62,13 +72,28 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const handleShowThankYouPage = () => {
+    setViewMode('thankyou');
+    if (typeof window !== 'undefined' && window.history) {
+      window.history.replaceState(null, '', '?page=thankyou');
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <div className="min-h-screen bg-[#050505] text-[#F5F5F5] font-sans selection:bg-amber-500 selection:text-black antialiased">
       
-      {/* Standalone Page Mode with Subtle Floating Switcher for Demo/Testing */}
+      {/* Standalone Page Mode Routing */}
       {viewMode === 'lead' ? (
         <LeadCapturePage 
           onGoToSalesPage={handleShowSalesPage}
+          onGoToThankYouPage={handleShowThankYouPage}
+          onAdminClick={handleOpenAdmin}
+        />
+      ) : viewMode === 'thankyou' ? (
+        <ThankYouPage 
+          onGoToSalesPage={handleShowSalesPage}
+          onGoToLeadPage={handleShowLeadPage}
           onAdminClick={handleOpenAdmin}
         />
       ) : (
@@ -104,6 +129,9 @@ export default function App() {
           {/* Free Bonus Vault */}
           <BonusVaultSection onBuyClick={handleOpenCheckout} />
 
+          {/* 2 Offers Package Comparison Section */}
+          <OffersComparisonSection onSelectOffer={(offerId) => handleOpenCheckout(offerId)} />
+
           {/* FAQ Accordion */}
           <FaqSection />
 
@@ -118,14 +146,36 @@ export default function App() {
         </>
       )}
 
-      {/* Floating Author Navigation Switcher (Kept discreet at top right for internal testing) */}
-      <div className="fixed bottom-3 right-3 z-50 bg-black/90 border border-white/20 p-1.5 rounded-lg shadow-2xl flex items-center gap-1.5 text-[10px] font-mono opacity-80 hover:opacity-100 transition-opacity">
+      {/* Floating Author Navigation Switcher (Kept discreet at bottom right for internal testing) */}
+      <div className="fixed bottom-3 right-3 z-50 bg-black/95 border border-white/20 p-1.5 rounded-xl shadow-2xl flex items-center gap-1.5 text-[10px] font-mono opacity-85 hover:opacity-100 transition-opacity">
         <button
-          onClick={viewMode === 'lead' ? handleShowSalesPage : handleShowLeadPage}
-          className="bg-white/10 hover:bg-white/20 text-white px-2 py-1 rounded flex items-center gap-1 font-bold"
-          title="Switch Page Mode"
+          onClick={handleShowLeadPage}
+          className={`px-2 py-1 rounded font-bold ${
+            viewMode === 'lead' ? 'bg-emerald-500 text-black' : 'bg-white/10 text-white hover:bg-white/20'
+          }`}
+          title="Free Class Lead Page"
         >
-          <span>{viewMode === 'lead' ? '🛒 Switch to Sales Page' : '📱 Switch to Free Class Page'}</span>
+          📱 Lead Page
+        </button>
+
+        <button
+          onClick={handleShowThankYouPage}
+          className={`px-2 py-1 rounded font-bold ${
+            viewMode === 'thankyou' ? 'bg-emerald-500 text-black' : 'bg-white/10 text-white hover:bg-white/20'
+          }`}
+          title="Thank You & WhatsApp Page"
+        >
+          🎉 Thank You Page
+        </button>
+
+        <button
+          onClick={handleShowSalesPage}
+          className={`px-2 py-1 rounded font-bold ${
+            viewMode === 'sales' ? 'bg-amber-500 text-black' : 'bg-white/10 text-white hover:bg-white/20'
+          }`}
+          title="Handbook Sales Page"
+        >
+          🛒 Sales Page
         </button>
 
         <button
@@ -138,7 +188,11 @@ export default function App() {
       </div>
 
       {/* Modals */}
-      <CheckoutModal isOpen={isCheckoutOpen} onClose={() => setIsCheckoutOpen(false)} />
+      <CheckoutModal
+        isOpen={isCheckoutOpen}
+        onClose={() => setIsCheckoutOpen(false)}
+        selectedOfferId={selectedOfferId}
+      />
       <SamplePreviewModal
         isOpen={isPreviewOpen}
         onClose={() => setIsPreviewOpen(false)}

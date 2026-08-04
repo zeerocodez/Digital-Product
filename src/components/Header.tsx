@@ -54,6 +54,12 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
           )}
 
+          <a href="#offers-pricing" className="hover:text-amber-500 transition-colors font-bold text-amber-400 flex items-center gap-1">
+            <span>OFFERS</span>
+            <span className="bg-amber-500 text-black text-[9px] px-1.5 py-0.5 font-mono font-black">
+              ₦1K / ₦5.5K
+            </span>
+          </a>
           <a href="#curriculum" className="hover:text-amber-500 transition-colors">
             Curriculum
           </a>

@@ -1,17 +1,19 @@
-import React, { useState } from 'react';
-import { X, Lock, ShieldCheck, CheckCircle2, ArrowRight, CreditCard, Sparkles, Download, Copy, Check, Zap } from 'lucide-react';
-import { COURSE_DETAILS } from '../data/courseData';
-import { OrderState } from '../types';
+import React, { useState, useEffect } from 'react';
+import { X, Lock, ShieldCheck, CheckCircle2, ArrowRight, CreditCard, Sparkles, Download, Copy, Check, Zap, BookOpen, Users } from 'lucide-react';
+import { COURSE_DETAILS, OFFERS } from '../data/courseData';
+import { OrderState, OfferId } from '../types';
 
 interface CheckoutModalProps {
   isOpen: boolean;
   onClose: () => void;
+  selectedOfferId?: OfferId;
 }
 
-export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose }) => {
+export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose, selectedOfferId = 'pdf_mentorship' }) => {
   const [order, setOrder] = useState<OrderState>({
     fullName: '',
     email: '',
+    selectedOfferId: selectedOfferId,
     paymentMethod: 'card',
     includeOrderBump: true,
     isProcessing: false,
@@ -21,9 +23,16 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
 
   const [copiedKey, setCopiedKey] = useState(false);
 
+  useEffect(() => {
+    if (selectedOfferId) {
+      setOrder(prev => ({ ...prev, selectedOfferId }));
+    }
+  }, [selectedOfferId]);
+
   if (!isOpen) return null;
 
-  const totalAmount = COURSE_DETAILS.discountPrice + (order.includeOrderBump ? COURSE_DETAILS.regularPriceBump : 0);
+  const activeOffer = OFFERS[order.selectedOfferId] || OFFERS.pdf_mentorship;
+  const totalAmount = activeOffer.price + (order.includeOrderBump ? COURSE_DETAILS.regularPriceBump : 0);
 
   const handleSubmitOrder = (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,7 +54,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
     if (order.downloadKey) {
       navigator.clipboard.writeText(order.downloadKey);
       setCopiedKey(true);
-      setTimeout(() => setCopiedKey(null as any), 2000);
+      setTimeout(() => setCopiedKey(false), 2000);
     }
   };
 
@@ -70,12 +79,78 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
                 <span>256-BIT SECURE NIGERIAN CHECKOUT</span>
               </div>
               <h3 className="text-xl sm:text-2xl font-bold text-white uppercase tracking-wider">
-                Claim Instant Digital Access + Live Class
+                Claim Instant Digital Access
               </h3>
               <p className="text-xs text-white/60">
-                Unlock the entire handbook, 500+ AI prompt vault, and Live Zoom Training Pass immediately.
+                Select your offer tier below and enter your details to gain instant access.
               </p>
             </div>
+
+            {/* OFFER SELECTION TABS IN CHECKOUT */}
+            <div className="space-y-1.5 font-mono">
+              <label className="text-[10px] font-bold text-amber-400 uppercase tracking-widest block">
+                1. CHOOSE YOUR OFFER TIER:
+              </label>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setOrder(prev => ({ ...prev, selectedOfferId: 'pdf_only' }))}
+                  className={`p-3 text-left border rounded-xl transition-all ${
+                    order.selectedOfferId === 'pdf_only'
+                      ? 'bg-emerald-500/20 border-emerald-400 text-emerald-300 shadow-lg'
+                      : 'bg-[#050505] border-white/10 text-white/50 hover:border-white/30'
+                  }`}
+                >
+                  <div className="flex items-center justify-between text-[11px] font-bold uppercase">
+                    <span className="flex items-center gap-1"><BookOpen className="w-3.5 h-3.5" /> PDF Only</span>
+                    <span className="text-xs font-mono font-black text-white">₦1,000</span>
+                  </div>
+                  <p className="text-[9px] text-emerald-400/80 font-sans mt-1">E-Book Handbook Download</p>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setOrder(prev => ({ ...prev, selectedOfferId: 'pdf_mentorship' }))}
+                  className={`p-3 text-left border rounded-xl transition-all relative ${
+                    order.selectedOfferId === 'pdf_mentorship'
+                      ? 'bg-amber-500/20 border-amber-500 text-amber-400 shadow-lg shadow-amber-500/10'
+                      : 'bg-[#050505] border-white/10 text-white/50 hover:border-amber-500/40'
+                  }`}
+                >
+                  <div className="flex items-center justify-between text-[11px] font-bold uppercase">
+                    <span className="flex items-center gap-1"><Users className="w-3.5 h-3.5" /> Live VIP</span>
+                    <span className="text-xs font-mono font-black text-amber-400">₦5,500</span>
+                  </div>
+                  <p className="text-[9px] text-amber-400/80 font-sans mt-1">PDF + Live Zoom & Mentorship</p>
+                </button>
+              </div>
+            </div>
+
+            {/* Direct Selar Callout for PDF Only offer */}
+            {order.selectedOfferId === 'pdf_only' && (
+              <div className="bg-emerald-950/40 border border-emerald-500/40 p-3.5 rounded-xl space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-bold text-emerald-400 font-mono flex items-center gap-1.5 uppercase">
+                    <Zap className="w-3.5 h-3.5 fill-emerald-400" /> Instant Selar Store Link Available
+                  </span>
+                  <span className="text-[10px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded font-mono">
+                    ₦1,000 ONLY
+                  </span>
+                </div>
+                <p className="text-xs text-emerald-100/80 font-sans leading-snug">
+                  You can pay ₦1,000 directly via our official Selar checkout page for instant automatic file delivery to your email!
+                </p>
+                <a
+                  href="https://selar.com/pdfmoneyblueprint"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-400 text-black font-black uppercase text-xs py-2.5 px-4 rounded transition-all shadow-md mt-1"
+                >
+                  <span>GO TO SELAR STORE (https://selar.com/pdfmoneyblueprint)</span>
+                  <ArrowRight className="w-3.5 h-3.5 stroke-[3]" />
+                </a>
+              </div>
+            )}
 
             {/* Order Summary Box */}
             <div className="bg-[#050505] border border-white/10 p-4 space-y-3 font-mono">
@@ -86,10 +161,10 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
 
               <div className="flex items-start justify-between gap-2 text-xs">
                 <div>
-                  <h4 className="font-bold text-white uppercase tracking-wide font-sans">{COURSE_DETAILS.title}</h4>
-                  <p className="text-[10px] text-white/40 font-mono">Includes 8 PDF Modules + Live Zoom Masterclass + ₦45,000 Bonus Vault</p>
+                  <h4 className="font-bold text-white uppercase tracking-wide font-sans">{activeOffer.name}</h4>
+                  <p className="text-[10px] text-white/40 font-mono">{activeOffer.tagline}</p>
                 </div>
-                <span className="font-bold text-amber-500 font-mono">₦{COURSE_DETAILS.discountPrice.toLocaleString()}</span>
+                <span className="font-bold text-amber-500 font-mono">₦{activeOffer.price.toLocaleString()}</span>
               </div>
 
               {/* High-Converting Order Bump */}
@@ -160,7 +235,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
                       type="button"
                       onClick={() => setOrder((prev) => ({ ...prev, paymentMethod: 'paystack' }))}
                       className={`py-2 px-2 border text-[11px] font-bold flex items-center justify-center gap-1 transition-all uppercase tracking-wider ${
-                        order.paymentMethod === 'paystack' || order.paymentMethod === 'card'
+                        order.paymentMethod === 'paystack'
                           ? 'bg-amber-500 text-black border-amber-500'
                           : 'bg-[#050505] text-white/60 border-white/10'
                       }`}
@@ -211,7 +286,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
               <button
                 type="submit"
                 disabled={order.isProcessing}
-                className="w-full group flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-400 text-black font-black uppercase tracking-widest text-xs sm:text-sm py-4 px-6 shadow-[0_0_30px_rgba(245,158,11,0.3)] transition-all"
+                className="w-full group flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-400 text-black font-black uppercase tracking-widest text-xs sm:text-sm py-4 px-6 shadow-[0_0_30px_rgba(245,158,11,0.3)] transition-all cursor-pointer"
               >
                 {order.isProcessing ? (
                   <div className="flex items-center gap-2">
@@ -221,7 +296,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
                 ) : (
                   <>
                     <Sparkles className="w-4 h-4 fill-black" />
-                    <span>PAY ₦{totalAmount.toLocaleString()} & GET ACCESS</span>
+                    <span>PAY ₦{totalAmount.toLocaleString()} & GET ACCESS NOW</span>
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </>
                 )}
@@ -229,7 +304,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
 
               <div className="flex items-center justify-center gap-2 text-[10px] text-white/40 text-center font-mono">
                 <ShieldCheck className="w-3.5 h-3.5 text-amber-500" />
-                <span>Instant PDF Download + Live Zoom Invite Sent to Email</span>
+                <span>Instant Access Details Delivered to Email + WhatsApp</span>
               </div>
             </form>
           </>
@@ -245,53 +320,43 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
                 ORDER SUCCESSFUL!
               </span>
               <h3 className="text-2xl sm:text-3xl font-bold text-white uppercase tracking-wider font-sans">
-                Welcome To The Inner Circle!
+                Welcome To The AI Academy!
               </h3>
               <p className="text-xs text-white/60 max-w-sm mx-auto font-sans">
-                Thank you <strong>{order.fullName}</strong>. A confirmation email with your access link has been dispatched to <strong>{order.email}</strong>.
+                Your payment of <strong className="text-amber-500">₦{totalAmount.toLocaleString()}</strong> for <strong className="text-white">{activeOffer.name}</strong> was confirmed. Your digital license key has been generated below:
               </p>
             </div>
 
-            {/* Generated License & Token Box */}
-            <div className="bg-[#050505] border border-amber-500/40 p-5 space-y-3 text-left">
-              <div className="flex items-center justify-between text-xs font-bold text-amber-500">
-                <span>YOUR INSTANT DOWNLOAD KEY:</span>
-                <span className="text-[10px] bg-amber-500/10 px-2 py-0.5 border border-amber-500/20 text-amber-500">ACTIVATED</span>
+            {/* License Key Box */}
+            <div className="bg-[#050505] border border-amber-500/40 p-4 space-y-2 text-center">
+              <div className="text-[10px] text-white/40 uppercase tracking-widest">YOUR DIGITAL LICENSE KEY:</div>
+              <div className="text-xl sm:text-2xl font-black text-amber-400 tracking-wider">
+                {order.downloadKey}
               </div>
 
-              <div className="flex items-center justify-between bg-[#0A0A0A] border border-white/10 p-3 font-mono text-sm font-bold text-white">
-                <span>{order.downloadKey}</span>
-                <button
-                  onClick={handleCopyKey}
-                  className="text-xs font-bold text-amber-500 hover:text-amber-400 flex items-center gap-1 uppercase tracking-wider"
-                >
-                  {copiedKey ? <Check className="w-4 h-4 text-amber-500" /> : <Copy className="w-4 h-4" />}
-                  <span>{copiedKey ? 'Copied!' : 'Copy'}</span>
-                </button>
-              </div>
-
-              <p className="text-[10px] text-white/40">
-                Use this token to access the course portal, prompt vault, and Canva templates.
-              </p>
-            </div>
-
-            {/* Action buttons */}
-            <div className="space-y-2">
               <button
-                onClick={() => {
-                  alert('Launching Course Member Dashboard & Download Portal...');
-                }}
-                className="w-full flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-400 text-black font-black uppercase tracking-widest text-xs py-3.5 px-6 shadow-[0_0_20px_rgba(245,158,11,0.25)] transition-all"
+                onClick={handleCopyKey}
+                className="inline-flex items-center gap-1.5 text-xs text-amber-500 hover:text-amber-400 font-bold uppercase tracking-wider pt-1"
               >
-                <Download className="w-4 h-4" />
-                <span>Open Student Portal & Access Vault</span>
+                {copiedKey ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                <span>{copiedKey ? 'COPIED TO CLIPBOARD!' : 'COPY LICENSE KEY'}</span>
+              </button>
+            </div>
+
+            <div className="space-y-3 pt-2">
+              <button
+                onClick={() => alert(`Downloading PDF Guide Handbook (${activeOffer.name})...`)}
+                className="w-full flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-400 text-black font-black uppercase tracking-widest text-xs py-4 px-6 shadow-lg transition-all"
+              >
+                <Download className="w-4 h-4 fill-black" />
+                <span>DOWNLOAD HANDBOOK PDF IMMEDIATELY</span>
               </button>
 
               <button
                 onClick={onClose}
-                className="w-full text-xs font-bold text-white/40 hover:text-white py-2 uppercase tracking-wider"
+                className="w-full bg-white/5 hover:bg-white/10 text-white/60 hover:text-white font-bold uppercase tracking-wider text-xs py-3 px-4 border border-white/10"
               >
-                Close Window
+                Return to Website
               </button>
             </div>
           </div>

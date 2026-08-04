@@ -26,9 +26,11 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { COURSE_DETAILS } from '../data/courseData';
+import { ThankYouPage } from './ThankYouPage';
 
 interface LeadCapturePageProps {
   onGoToSalesPage: () => void;
+  onGoToThankYouPage?: () => void;
   onAdminClick?: () => void;
 }
 
@@ -44,6 +46,7 @@ export interface CapturedLead {
 
 export const LeadCapturePage: React.FC<LeadCapturePageProps> = ({
   onGoToSalesPage,
+  onGoToThankYouPage,
   onAdminClick
 }) => {
   const [name, setName] = useState('');
@@ -148,9 +151,25 @@ export const LeadCapturePage: React.FC<LeadCapturePageProps> = ({
       setIsSubmitted(true);
       setSeatsLeft(prev => Math.max(1, prev - 1));
 
-      window.scrollTo({ top: 100, behavior: 'smooth' });
+      if (onGoToThankYouPage) {
+        onGoToThankYouPage();
+      }
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }, 800);
   };
+
+  if (isSubmitted) {
+    return (
+      <ThankYouPage 
+        leadName={name}
+        leadPhone={phone}
+        onGoToSalesPage={onGoToSalesPage}
+        onGoToLeadPage={() => setIsSubmitted(false)}
+        onAdminClick={onAdminClick}
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#050505] text-[#F5F5F5] font-sans selection:bg-emerald-500 selection:text-black">

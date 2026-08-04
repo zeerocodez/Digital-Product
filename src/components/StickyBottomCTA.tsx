@@ -70,10 +70,11 @@ export const StickyBottomCTA: React.FC<StickyBottomCTAProps> = ({ onBuyClick }) 
           </div>
 
           <div className="text-left">
-            <span className="text-[9px] text-amber-500 font-bold block uppercase tracking-widest">ENROLLMENT FEE</span>
+            <span className="text-[9px] text-amber-500 font-bold block uppercase tracking-widest">ENROLLMENT OFFERS</span>
             <div className="flex items-baseline gap-1">
-              <span className="text-lg sm:text-2xl font-black text-amber-500">₦{COURSE_DETAILS.discountPrice.toLocaleString()}</span>
-              <span className="text-white/40 line-through text-xs font-semibold">₦25,000</span>
+              <span className="text-base sm:text-xl font-black text-white">₦1,000</span>
+              <span className="text-white/40 text-xs font-mono">or</span>
+              <span className="text-base sm:text-xl font-black text-amber-500">₦5,500</span>
             </div>
           </div>
         </div>
@@ -81,9 +82,9 @@ export const StickyBottomCTA: React.FC<StickyBottomCTAProps> = ({ onBuyClick }) 
         {/* Action Button */}
         <button
           onClick={onBuyClick}
-          className="group flex-1 sm:flex-none flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-400 text-black font-black uppercase tracking-widest py-3 px-5 text-xs shadow-[0_0_25px_rgba(245,158,11,0.3)] transition-all transform hover:-translate-y-0.5"
+          className="group flex-1 sm:flex-none flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-400 text-black font-black uppercase tracking-widest py-3 px-5 text-xs shadow-[0_0_25px_rgba(245,158,11,0.3)] transition-all transform hover:-translate-y-0.5 cursor-pointer"
         >
-          <span>CLAIM ₦10,000 PASS NOW</span>
+          <span>CLAIM YOUR OFFER NOW</span>
           <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
         </button>
 

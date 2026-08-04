@@ -41,10 +41,27 @@ export interface FAQItem {
   category: 'general' | 'monetization' | 'access' | 'resell';
 }
 
+export type OfferId = 'pdf_only' | 'pdf_mentorship';
+
+export interface OfferOption {
+  id: OfferId;
+  name: string;
+  price: number;
+  originalPrice: number;
+  badge?: string;
+  popular?: boolean;
+  tagline: string;
+  description: string;
+  features: string[];
+  notIncluded?: string[];
+  selarUrl?: string;
+}
+
 export interface OrderState {
   fullName: string;
   email: string;
   phone?: string;
+  selectedOfferId: OfferId;
   paymentMethod: 'paystack' | 'bank_transfer' | 'flutterwave' | 'card';
   includeOrderBump: boolean;
   isProcessing: boolean;

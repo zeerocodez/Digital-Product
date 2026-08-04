@@ -1,4 +1,49 @@
-import { Testimonial, CourseModule, BonusItem, FAQItem } from '../types';
+import { Testimonial, CourseModule, BonusItem, FAQItem, OfferOption } from '../types';
+
+export const OFFERS: Record<'pdf_only' | 'pdf_mentorship', OfferOption> = {
+  pdf_only: {
+    id: 'pdf_only',
+    name: 'PDF Guide Only',
+    price: 1000,
+    originalPrice: 15000,
+    selarUrl: 'https://selar.com/pdfmoneyblueprint',
+    tagline: 'Instant E-Book Handbook Download',
+    description: 'Get instant access to the complete 8-module PDF handbook + 500 AI prompts vault directly on your smartphone or PC.',
+    features: [
+      'Complete 8-Module Digital Products PDF Guide',
+      '500+ High-Converting AI Prompts Vault',
+      'Smartphone Digital Product Creation Step-by-Step System',
+      'Selar Automated Store Setup & Payment Guide',
+      'Instant Download Link Sent to Email & Dashboard'
+    ],
+    notIncluded: [
+      'Live Masterclass Training with Nuel Effiong',
+      'Direct Q&A & Mentorship Sessions',
+      'VIP WhatsApp Creator Mastermind Community Access',
+      'WhatsApp Autoresponder Copy-Paste Sales Scripts'
+    ]
+  },
+  pdf_mentorship: {
+    id: 'pdf_mentorship',
+    name: 'PDF Guide + Live Training & Mentorship',
+    price: 5500,
+    originalPrice: 75000,
+    popular: true,
+    badge: '🔥 MOST POPULAR & RECOMMENDED',
+    tagline: 'Complete VIP Bundle + Live Zoom & Community',
+    description: 'Get the full PDF handbook PLUS live training with Nuel Effiong, direct Q&A mentorship, and VIP community access.',
+    features: [
+      'Complete 8-Module Digital Products PDF Guide',
+      '500+ High-Converting AI Prompts Vault',
+      'Smartphone Digital Product Creation Step-by-Step System',
+      'Selar Automated Store Setup & Payment Guide',
+      'Live Masterclass Training Pass with Nuel Effiong',
+      'Direct Q&A & 1-on-1 Mentorship Sessions',
+      'VIP WhatsApp Creator Mastermind Community Access',
+      '₦45,000 Complete Bonus Vault (WhatsApp Bot Scripts + Notion Systems)'
+    ]
+  }
+};
 
 export const COURSE_DETAILS = {
   title: 'DIGITAL PRODUCTS CREATION WITH AI',
@@ -8,9 +53,11 @@ export const COURSE_DETAILS = {
   authorTitle: 'Founder & Lead Instructor, AI Income Academy',
   publisher: 'Zeerocodes Automation Limited',
   location: 'Uyo, Akwa Ibom State, Nigeria',
-  liveTrainingOffer: 'PURCHASING THIS PDF GUIDE GIVES YOU ACCESS TO THE LIVE TRAINING COURSE!!',
+  liveTrainingOffer: '2 EXCLUSIVE OFFERS AVAILABLE: PDF GUIDE ONLY (₦1,000) OR PDF GUIDE + LIVE MENTORSHIP (₦5,500)',
+  pdfOnlyPrice: 1000,
+  pdfMentorshipPrice: 5500,
   originalPrice: 75000,
-  discountPrice: 10000,
+  discountPrice: 5500,
   regularPriceBump: 3000,
   spotsRemaining: 18,
   guaranteeDays: 30,
