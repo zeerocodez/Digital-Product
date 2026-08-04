@@ -147,7 +147,7 @@ export const TESTIMONIALS: Testimonial[] = [
     verified: true,
     rating: 5,
     result: '340+ Copies Sold',
-    quote: 'Nuel Effiong breakdown of product mockups in Module 5 made my Canva ebooks look like Fortune 500 publications. Best ₦10,000 investment I have made in 2026.',
+    quote: 'Nuel Effiong breakdown of product mockups in Module 5 made my Canva ebooks look like Fortune 500 publications. Best ₦5,500 investment I have made in 2026.',
     platform: 'Direct Sales',
     date: '5 days ago',
   },
@@ -355,7 +355,7 @@ export const FAQS: FAQItem[] = [
   },
   {
     question: 'How much is the fee and what payment methods are accepted?',
-    answer: 'The complete package fee is strictly ₦10,000 (one-time payment). We accept Nigerian Debit Cards, Bank Transfer, Paystack, Flutterwave, and Selar direct checkout.',
+    answer: 'We offer 2 flexible tiers: Option 1 is the standalone PDF Guide Handbook for ₦1,000 (direct on Selar: selar.com/pdfmoneyblueprint or bank transfer), and Option 2 is the Complete VIP Masterclass with Live Training & Direct Mentorship for ₦5,500. We accept Cards, Bank Transfer, Paystack, Flutterwave, and Selar.',
     category: 'general',
   },
   {

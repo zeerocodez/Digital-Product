@@ -4,7 +4,7 @@ import { X, Download, FileText, Sparkles, CheckCircle2, Lock, Copy, Check } from
 interface SamplePreviewModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onBuyClick: () => void;
+  onBuyClick: (offerId?: 'pdf_only' | 'pdf_mentorship') => void;
 }
 
 export const SamplePreviewModal: React.FC<SamplePreviewModalProps> = ({ isOpen, onClose, onBuyClick }) => {
@@ -54,14 +54,14 @@ export const SamplePreviewModal: React.FC<SamplePreviewModalProps> = ({ isOpen, 
         <div className="space-y-2">
           <div className="inline-flex items-center gap-1.5 bg-amber-500/10 text-amber-500 border border-amber-500/20 text-[10px] font-bold px-3 py-1 font-mono uppercase tracking-widest">
             <FileText className="w-3 h-3" />
-            <span>FREE SAMPLE CHAPTER & PROMPTS</span>
+            <span>FREE DIGITAL PRODUCT PROMPT PACK PREVIEW</span>
           </div>
 
           <h3 className="text-2xl sm:text-3xl font-bold text-white uppercase tracking-wider">
-            Chapter 1: The AI Digital Product Niche Matrix
+            THE DIGITAL PRODUCT PROMPT PACK
           </h3>
           <p className="text-xs sm:text-sm text-white/60">
-            Get a free sneak peek at lesson materials & test 2 of our master Gemini prompts right now!
+            From Idea to Sale: How to Build a PDF Guide People Will Actually Pay For. Get a sneak peek & test sample master prompts below!
           </p>
         </div>
 
@@ -139,17 +139,28 @@ export const SamplePreviewModal: React.FC<SamplePreviewModalProps> = ({ isOpen, 
           <div className="bg-[#050505] border border-amber-500/30 p-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
             <div className="space-y-0.5 text-center sm:text-left">
               <span className="font-bold text-white uppercase tracking-wider font-sans block">Ready for the Complete Handbook + Live Masterclass?</span>
-              <span className="text-white/50 text-[11px] font-mono">Get instant access to all 8 modules + Live Zoom Class for ₦10,000</span>
+              <span className="text-white/50 text-[11px] font-mono">Get instant access to all 8 modules + Live Zoom Class for ₦5,500 (or PDF guide for ₦1,000)</span>
             </div>
-            <button
-              onClick={() => {
-                onClose();
-                onBuyClick();
-              }}
-              className="bg-amber-500 hover:bg-amber-400 text-black font-black uppercase tracking-widest text-xs px-4 py-2.5 transition-all shrink-0 shadow-[0_0_15px_rgba(245,158,11,0.2)]"
-            >
-              Get Full Handbook (₦10,000)
-            </button>
+            <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 shrink-0">
+              <button
+                onClick={() => {
+                  onClose();
+                  onBuyClick('pdf_only');
+                }}
+                className="bg-white/10 hover:bg-white/20 text-white font-bold uppercase tracking-wider text-[11px] px-3 py-2.5 rounded transition-all border border-white/20 cursor-pointer"
+              >
+                PDF Only (₦1,000)
+              </button>
+              <button
+                onClick={() => {
+                  onClose();
+                  onBuyClick('pdf_mentorship');
+                }}
+                className="bg-amber-500 hover:bg-amber-400 text-black font-black uppercase tracking-widest text-[11px] px-4 py-2.5 rounded transition-all shadow-[0_0_15px_rgba(245,158,11,0.2)] cursor-pointer"
+              >
+                Live Class (₦5,500)
+              </button>
+            </div>
           </div>
         </div>
 
